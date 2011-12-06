@@ -2,15 +2,16 @@
 -compile(export_all).
 
 world_tick(LivingCells) ->
-  {Time, Value} = timer:tc(game_of_life, timed_world_tick, [LivingCells]),
-  erlang:display(Time),
-  Value.
-
-timed_world_tick(LivingCells) ->
   Candidates = lists:flatmap(fun emit_cells/1, LivingCells),
   CountedCandiates = lists:foldl(fun combine_cells/2, dict:new(), Candidates),
   TickedCells = dict:fold(fun key_value_to_ticked_cell/3, [], CountedCandiates),
   lists:flatmap(fun drop_dead_cells/1, TickedCells).
+
+timed_world_tick(Width, Heigh) ->
+  LivingCells = [{X, Y} || X <- lists:seq(1,Width), Y <- lists:seq(1,Heigh)],
+  {Time, _} = timer:tc(game_of_life, world_tick, [LivingCells]),
+  lists:flatten(io_lib:format("Ticked ~p cells in ~p milliseconds.",
+                [length(LivingCells), Time/1000])).
 
 emit_cells({X, Y}) ->
   [ {X-1, Y-1, 1, false}, {X-1, Y  , 1, false}, {X-1, Y+1, 1, false},
