@@ -1,12 +1,13 @@
 -module(game_of_life).
 -compile(export_all).
 
-evolve(FinalState, 0) ->
+evolve(InitialState, Max) ->
+  evolve(InitialState, 0, Max).
+evolve(FinalState, Cycles, Max) when Cycles == Max ->
   FinalState;
-evolve(InitialState, Cycles) ->
-  NextState = world_tick(InitialState),
-  create_image:draw_points(NextState, integer_to_list(Cycles)),
-  evolve(NextState, Cycles - 1).
+evolve(InitialState, Cycles, Max) ->
+  create_image:draw_points(InitialState, integer_to_list(Cycles)),
+  evolve(world_tick(InitialState), Cycles + 1, Max).
 
 world_tick(LivingCells) ->
   Candidates = lists:flatmap(fun emit_cells/1, LivingCells),
@@ -46,3 +47,9 @@ tick(_, _) -> false.
 drop_dead_cells({X, Y, true})  -> [{X, Y}];
 drop_dead_cells({_X, _Y, false}) -> [].
 
+glider_gun() ->
+  [{3,  6}, {4,  6}, {3,  7},  {4, 7},  {13, 6},  {13, 7}, {13, 8}, {14, 5},
+   {14, 9}, {15, 4}, {15, 10}, {16, 4}, {16, 10}, {17, 7}, {18, 5},
+   {18, 9}, {19, 6}, {19, 7},  {19, 8}, {20, 7},  {23, 4}, {23, 5},
+   {23, 6}, {24, 4}, {24, 5},  {24, 6}, {25, 3},  {25, 7}, {27, 2},
+   {27, 3}, {27, 7}, {27, 8},  {37, 4}, {37, 5},  {38, 4}, {38, 5}].
