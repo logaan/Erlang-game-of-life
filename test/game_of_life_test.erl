@@ -1,50 +1,59 @@
 -module(game_of_life_test).
-
 -compile(export_all).
--import(game_of_life, [tick/2, emit_cells/1, world_tick/1, timed_world_tick/2, evolve/2]).
-
 -include_lib("eunit/include/eunit.hrl").
 
 live_cell_tick_test() ->
-  false = tick(true, 0),
-  false = tick(true, 1),
-  true  = tick(true, 2),
-  true  = tick(true, 3),
-  false = tick(true, 4),
-  false = tick(true, 5),
-  false = tick(true, 6),
-  false = tick(true, 7),
-  false = tick(true, 8).
+  false = game_of_life:tick(true, 0),
+  false = game_of_life:tick(true, 1),
+  true  = game_of_life:tick(true, 2),
+  true  = game_of_life:tick(true, 3),
+  false = game_of_life:tick(true, 4),
+  false = game_of_life:tick(true, 5),
+  false = game_of_life:tick(true, 6),
+  false = game_of_life:tick(true, 7),
+  false = game_of_life:tick(true, 8).
 
 dead_cell_tick_test() ->
-  false = tick(false, 0),
-  false = tick(false, 1),
-  false = tick(false, 2),
-  true  = tick(false, 3),
-  false = tick(false, 4),
-  false = tick(false, 5),
-  false = tick(false, 6),
-  false = tick(false, 7),
-  false = tick(false, 8).
+  false = game_of_life:tick(false, 0),
+  false = game_of_life:tick(false, 1),
+  false = game_of_life:tick(false, 2),
+  true  = game_of_life:tick(false, 3),
+  false = game_of_life:tick(false, 4),
+  false = game_of_life:tick(false, 5),
+  false = game_of_life:tick(false, 6),
+  false = game_of_life:tick(false, 7),
+  false = game_of_life:tick(false, 8).
 
 world_tick_test() ->
-  [] = world_tick([{0,0}]),
-  [] = world_tick([{0,0}, {1,0}]),
-  [{0,0}, {0,-1}, {0,1}] = world_tick([{0,0}, {-1,0}, {1,0}]),
-  [{0,0}, {-1,0}, {1,0}] = world_tick([{0,0}, {0,-1}, {0,1}]).
+  [] = game_of_life:world_tick([{0,0}]),
+  [] = game_of_life:world_tick([{0,0}, {1,0}]),
+  [{0,0}, {0,-1}, {0,1}] = game_of_life:world_tick([{0,0}, {-1,0}, {1,0}]),
+  [{0,0}, {-1,0}, {1,0}] = game_of_life:world_tick([{0,0}, {0,-1}, {0,1}]).
 
 drawing_world_tick_test() ->
   StartWorld = [{0,0}, {0,-1}, {0,1}],
-  EndWorld = world_tick(StartWorld),
+  EndWorld = game_of_life:world_tick(StartWorld),
   create_image:draw_points(StartWorld, "start"),
   create_image:draw_points(EndWorld, "end").
 
 evolve_test() ->
-  StartWorld = game_of_life:generate_square_world(10,10),
-  evolve(StartWorld, 30).
+  StartWorld = game_of_life:generate_square_world(100,100),
+  create_image:draw_points(StartWorld, "2"),
+  game_of_life:evolve(StartWorld, 1).
+
+glider_gun_test() ->
+  create_image:draw_points(glider_gun(), "101"),
+  game_of_life:evolve(glider_gun(), 100).
+
+glider_gun() ->
+  [{3,  6}, {4,  6}, {3,  7},  {4, 7},  {13, 6},  {13, 7}, {13, 8}, {14, 5},
+   {14, 9}, {15, 4}, {15, 10}, {16, 4}, {16, 10}, {17, 7}, {18, 5},
+   {18, 9}, {19, 6}, {19, 7},  {19, 8}, {20, 7},  {23, 4}, {23, 5},
+   {23, 6}, {24, 4}, {24, 5},  {24, 6}, {25, 3},  {25, 7}, {27, 2},
+   {27, 3}, {27, 7}, {27, 8},  {37, 4}, {37, 5},  {38, 4}, {38, 5}].
 
 timed_world_tick_test() ->
-  {Value, Description} = timed_world_tick(100, 100),
+  {Value, Description} = game_of_life:timed_world_tick(100, 100),
   create_image:draw_points(Value, "10000"),
   erlang:display(Description).
 
@@ -57,4 +66,5 @@ emit_cells_test() ->
     {0,1,1,false},
     {1,-1,1,false},
     {1,0,1,false},
-    {1,1,1,false}] = emit_cells({0,0}).
+    {1,1,1,false}] = game_of_life:emit_cells({0,0}).
+
