@@ -10,3 +10,14 @@ directory that contains this file), and run
 
    ./rebar eunit
 
+NOTES
+
+The first two lines of world tick might be moved out so that they can work on a
+subset of the living cells. Then return a dict with counts for each subset.
+These dicts could then be merged. This would allow multiple erlang processes to
+crunch the explode and count. Could even have the work parcelled off as each
+set of living cells are read in. Might mean we could work on more cells than
+can fit in memory on one machine. When each process completes the dicts could
+be merged at the master. The master would sit there looping and waiting for new
+dicts to pull into it's own.
+

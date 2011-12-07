@@ -1,7 +1,7 @@
 -module(game_of_life_test).
 
 -compile(export_all).
--import(game_of_life, [tick/2, emit_cells/1, world_tick/1, timed_world_tick/2]).
+-import(game_of_life, [tick/2, emit_cells/1, world_tick/1, timed_world_tick/2, evolve/2]).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -33,8 +33,20 @@ world_tick_test() ->
   [{0,0}, {0,-1}, {0,1}] = world_tick([{0,0}, {-1,0}, {1,0}]),
   [{0,0}, {-1,0}, {1,0}] = world_tick([{0,0}, {0,-1}, {0,1}]).
 
+drawing_world_tick_test() ->
+  StartWorld = [{0,0}, {0,-1}, {0,1}],
+  EndWorld = world_tick(StartWorld),
+  create_image:draw_points(StartWorld, "start"),
+  create_image:draw_points(EndWorld, "end").
+
+evolve_test() ->
+  StartWorld = game_of_life:generate_square_world(10,10),
+  evolve(StartWorld, 30).
+
 timed_world_tick_test() ->
-  erlang:display(timed_world_tick(100, 100)).
+  {Value, Description} = timed_world_tick(100, 100),
+  create_image:draw_points(Value, "10000"),
+  erlang:display(Description).
 
 emit_cells_test() ->
   [ {-1,-1,1,false},
@@ -46,4 +58,3 @@ emit_cells_test() ->
     {1,-1,1,false},
     {1,0,1,false},
     {1,1,1,false}] = emit_cells({0,0}).
-
